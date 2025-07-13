@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: py2cy
+Version: 0.1.0
+Requires-Dist: click>=8.0
+Requires-Dist: cython>=0.29

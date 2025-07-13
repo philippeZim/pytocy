@@ -1,0 +1,10 @@
+[project]
+name = "py2cy"
+version = "0.1.0"
+dependencies = [
+    "click>=8.0",
+    "cython>=0.29"
+]
+
+[project.scripts]
+py2cy = "py2cy.cli:main"
