@@ -9,8 +9,11 @@ py2cy.egg-info/dependency_links.txt
 py2cy.egg-info/entry_points.txt
 py2cy.egg-info/requires.txt
 py2cy.egg-info/top_level.txt
+py2cy/build/__init__.py
+py2cy/build/pxd_generator.py
 py2cy/build/setup_generator.py
 py2cy/core/code_generator.py
+py2cy/core/pxd_generator.py
 py2cy/core/symbol_table.py
 py2cy/core/transformer.py
 py2cy/models/type_defs.py

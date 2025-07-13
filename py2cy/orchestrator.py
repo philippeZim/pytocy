@@ -5,8 +5,7 @@ from py2cy.config import AppConfig
 from py2cy.core.symbol_table import SymbolTable
 from py2cy.core.transformer import CythonASTTransformer
 from py2cy.core.code_generator import CythonCodeGenerator
-# from py2cy.build.setup_generator import generate_setup_file # Assuming this exists
-from py2cy.build.pxd_generator import generate_pxd_file
+from py2cy.core.pxd_generator import PxdCodeGenerator # Changed from build to core
 
 # Placeholder for the setup generator if it doesn't exist in the provided code
 def generate_setup_file(module_name: str, output_dir: Path, use_cpp: bool):
@@ -41,7 +40,7 @@ class TranspilationPipeline:
         self.module_name = input_path.stem
 
     def run(self):
-        print(f"Starting V3 transpilation for {self.input_path}...")
+        print(f"Starting V4 transpilation for {self.input_path}...")
         source_code = self.input_path.read_text()
         py_ast = ast.parse(source_code)
         
@@ -53,7 +52,8 @@ class TranspilationPipeline:
         if transformer.uses_cpp:
             print("C++ types detected. Will generate C++-compatible build script.")
         
-        code_gen = CythonCodeGenerator()
+        # FINAL FIX: Pass the symbol table to the code generator
+        code_gen = CythonCodeGenerator(transformer.symbol_table)
         cython_code = code_gen.generate(
             transformed_ast,
             self.config.compiler_directives,
@@ -66,12 +66,14 @@ class TranspilationPipeline:
         output_pyx_path.write_text(cython_code)
         print(f"Successfully wrote Cython file to: {output_pyx_path}")
 
-        # --- NEW: Generate the .pxd file ---
-        generate_pxd_file(
-            self.module_name,
-            self.output_dir,
-            transformer.class_nodes,
+        # --- Generate the .pxd file ---
+        pxd_gen = PxdCodeGenerator()
+        pxd_code = pxd_gen.generate(
+            transformed_ast,
             transformer.required_cimports
         )
+        output_pxd_path = self.output_dir / f"{self.module_name}.pxd"
+        output_pxd_path.write_text(pxd_code)
+        print(f"Successfully wrote PXD file to: {output_pxd_path}")
 
         generate_setup_file(self.module_name, self.output_dir, transformer.uses_cpp)
